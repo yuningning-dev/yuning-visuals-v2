@@ -1,1 +1,88 @@
-document.addEventListener('DOMContentLoaded',()=>{const loader=document.querySelector('.loader');const hero=document.querySelector('.hero');let front=document.querySelector('.mountain-layer--front');document.querySelector('.mountain-layer--back')?.remove();const style=document.createElement('style');style.textContent=`.mountain-layer--front{position:absolute!important;inset:0!important;z-index:9999!important;height:100%!important;display:block!important;overflow:visible!important}.hero__title{position:relative;z-index:4;left:clamp(-2.8rem,-2vw,-.8rem)}.guohua-raster{position:absolute!important;inset:0!important;z-index:10000!important;width:100%!important;height:100%!important;display:block!important;object-fit:cover!important;object-position:center bottom!important;opacity:1!important;visibility:visible!important;transform:translateY(60%) scale(1.04);filter:none!important;mix-blend-mode:normal!important;pointer-events:none}.raster-veil{position:absolute!important;inset:0!important;z-index:10001!important;background:linear-gradient(180deg,transparent 32%,rgba(8,10,12,.1) 54%,rgba(3,4,5,.72) 100%);opacity:1!important;transform:translateY(60%);pointer-events:none}.ink-splash{position:absolute;inset:8% 0 auto;height:38%;z-index:10002;opacity:0;pointer-events:none}.ink-splash i{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:var(--h);border-radius:65% 25% 60% 35%;background:#090d11;opacity:var(--o);transform:rotate(var(--r))}.ink-splash i:nth-child(odd){border-radius:25% 70% 30% 60%}@media(max-width:700px){.hero__title{left:-.35rem}}`;document.head.appendChild(style);if(!front){front=document.createElement('div');front.className='mountain-layer--front';hero?.appendChild(front)}front.replaceChildren();front.innerHTML='<img class="guohua-raster" src="./assets/yuning-guohua-shadow-transparent.png?v=6" alt="Paysage chinois monochrome avec montagnes, pins, temple et brume"><div class="raster-veil" aria-hidden="true"></div>';const art=front.querySelector('.guohua-raster');const splash=document.createElement('div');splash.className='ink-splash';[['4%','12%','13px','44px','-28deg','.55'],['17%','5%','8px','32px','24deg','.42'],['29%','19%','20px','9px','-45deg','.5'],['47%','7%','11px','38px','58deg','.6'],['64%','16%','15px','9px','-25deg','.45'],['81%','4%','10px','35px','38deg','.52'],['94%','24%','16px','8px','-52deg','.42']].forEach(([x,y,w,h,r,o])=>{const i=document.createElement('i');i.style.cssText=`--x:${x};--y:${y};--w:${w};--h:${h};--r:${r};--o:${o}`;splash.appendChild(i)});front.appendChild(splash);const reveal=()=>{if(!window.gsap){art.style.transform='translateY(0) scale(1.04)';document.querySelector('.raster-veil').style.transform='translateY(0)';loader?.remove();return}gsap.registerPlugin(ScrollTrigger);gsap.to(loader,{opacity:0,duration:.7,delay:.3,onComplete:()=>loader?.remove()});gsap.set('.guohua-raster,.raster-veil',{yPercent:60});const tl=gsap.timeline({scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1.25}});tl.from('.hero__sun',{scale:.55,opacity:0,duration:1.1,ease:'power2.out'}).from('.hero__content .eyebrow,.hero__title span,.hero__subtitle,.hero__cta',{y:45,opacity:0,stagger:.1,duration:1,ease:'power4.out'},'-.15').to('.hero__title',{yPercent:-2,scale:.98,opacity:1,duration:2.4,ease:'none'},'>').to('.hero__subtitle,.hero__cta',{opacity:.8,y:-8,duration:.7,ease:'none'},'<').to('.guohua-raster,.raster-veil',{yPercent:0,duration:2.2,ease:'power2.out'},'>-.6').to('.ink-splash',{opacity:1,scale:1,duration:.35,ease:'back.out(1.4)'},'>-.25').to('.hero__subtitle,.hero__cta',{opacity:0,y:-25,duration:.35,ease:'power2.in'},'>.2').to('.hero__title',{opacity:.35,duration:.45,ease:'power2.in'},'>.8');gsap.utils.toArray('.section-label,.intro h2,.intro__grid>div,.work__heading,.project-card,.process__list>div,.contact__inner>*').forEach(el=>gsap.from(el,{y:60,opacity:0,duration:.9,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none reverse'}}));setTimeout(()=>{if(parseFloat(getComputedStyle(art).opacity)>0&&art.getBoundingClientRect().top>innerHeight*1.2)gsap.set('.guohua-raster,.raster-veil',{yPercent:0})},1800)};art.complete?reveal():art.addEventListener('load',reveal,{once:true});setTimeout(()=>{if(!art.complete||!art.naturalWidth){art.style.transform='translateY(0) scale(1.04)';document.querySelector('.raster-veil').style.transform='translateY(0)';loader?.remove()}},2200)});
+document.addEventListener('DOMContentLoaded', () => {
+  const loader = document.querySelector('.loader');
+  const front  = document.querySelector('.mountain-layer--front');
+  const art    = document.querySelector('.guohua-raster');
+  const veil   = document.querySelector('.raster-veil');
+
+  const clearLoader = () => loader?.remove();
+
+  // Safety net: whatever happens with animation/GSAP below, the loader must
+  // never stay on screen forever, and the image/veil are ALREADY visible via
+  // plain CSS (see .guohua-raster / .raster-veil in styles.css) — so if
+  // anything below fails, the visitor still sees the artwork, just static.
+  if (!front || !art || !veil) {
+    console.warn('[yuning-visuals] Hero elements missing, skipping animation.');
+    clearLoader();
+    return;
+  }
+
+  art.addEventListener('error', () => {
+    console.error('[yuning-visuals] guohua-raster image failed to load:', art.currentSrc || art.src);
+  });
+
+  // Small decorative ink-splash particles, added once, purely cosmetic.
+  const splash = document.createElement('div');
+  splash.className = 'ink-splash';
+  [
+    ['4%', '12%', '13px', '44px', '-28deg', '.55'],
+    ['17%', '5%', '8px', '32px', '24deg', '.42'],
+    ['29%', '19%', '20px', '9px', '-45deg', '.5'],
+    ['47%', '7%', '11px', '38px', '58deg', '.6'],
+    ['64%', '16%', '15px', '9px', '-25deg', '.45'],
+    ['81%', '4%', '10px', '35px', '38deg', '.52'],
+    ['94%', '24%', '16px', '8px', '-52deg', '.42'],
+  ].forEach(([x, y, w, h, r, o]) => {
+    const i = document.createElement('i');
+    i.style.cssText = `--x:${x};--y:${y};--w:${w};--h:${h};--r:${r};--o:${o}`;
+    splash.appendChild(i);
+  });
+  front.appendChild(splash);
+
+  // Everything past this point is a PROGRESSIVE ENHANCEMENT: the scroll-driven
+  // reveal (image sliding up from behind, title fading, etc). If GSAP or
+  // ScrollTrigger didn't load (CDN blocked, offline, ad-blocker...), we just
+  // bail out cleanly and leave the static CSS layout in place — the image
+  // stays visible, it just doesn't animate.
+  const startAnimation = () => {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.to(loader, { opacity: 0, duration: .7, delay: .3, onComplete: clearLoader });
+
+    // Only NOW do we hide the art off-screen, right before animating it back in.
+    gsap.set([art, veil], { yPercent: 60 });
+
+    const tl = gsap.timeline({
+      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1.25 }
+    });
+    tl.from('.hero__sun', { scale: .55, opacity: 0, duration: 1.1, ease: 'power2.out' })
+      .from('.hero__content .eyebrow, .hero__title span, .hero__subtitle, .hero__cta',
+        { y: 45, opacity: 0, stagger: .1, duration: 1, ease: 'power4.out' }, '-.15')
+      .to('.hero__title', { yPercent: -2, scale: .98, opacity: 1, duration: 2.4, ease: 'none' }, '>')
+      .to('.hero__subtitle, .hero__cta', { opacity: .8, y: -8, duration: .7, ease: 'none' }, '<')
+      .to([art, veil], { yPercent: 0, duration: 2.2, ease: 'power2.out' }, '>-.6')
+      .to(splash, { opacity: 1, scale: 1, duration: .35, ease: 'back.out(1.4)' }, '>-.25')
+      .to('.hero__subtitle, .hero__cta', { opacity: 0, y: -25, duration: .35, ease: 'power2.in' }, '>.2')
+      .to('.hero__title', { opacity: .35, duration: .45, ease: 'power2.in' }, '>.8');
+
+    gsap.utils.toArray(
+      '.section-label, .intro h2, .intro__grid>div, .work__heading, .project-card, .process__list>div, .contact__inner>*'
+    ).forEach(el => gsap.from(el, {
+      y: 60, opacity: 0, duration: .9, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none reverse' }
+    }));
+  };
+
+  try {
+    if (window.gsap && window.ScrollTrigger) {
+      startAnimation();
+    } else {
+      console.warn('[yuning-visuals] GSAP/ScrollTrigger not available — showing static hero.');
+      clearLoader();
+    }
+  } catch (err) {
+    // Whatever goes wrong in the animation, never let it leave the art hidden
+    // or the loader stuck on screen.
+    console.error('[yuning-visuals] Animation failed, falling back to static hero:', err);
+    gsap?.set?.([art, veil], { yPercent: 0, clearProps: 'transform' });
+    clearLoader();
+  }
+});
