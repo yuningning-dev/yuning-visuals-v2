@@ -56,12 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
     tl.from('.hero__sun', { scale: .55, opacity: 0, duration: 1.1, ease: 'power2.out' })
       .from('.hero__content .eyebrow, .hero__title span, .hero__subtitle, .hero__cta',
         { y: 45, opacity: 0, stagger: .1, duration: 1, ease: 'power4.out' }, '-.15')
-      .to('.hero__title', { yPercent: -2, scale: .98, opacity: 1, duration: 2.4, ease: 'none' }, '>')
-      .to('.hero__subtitle, .hero__cta', { opacity: .8, y: -8, duration: .7, ease: 'none' }, '<')
-      .to([art, veil], { yPercent: 0, duration: 2.2, ease: 'power2.out' }, '>-.6')
-      .to(splash, { opacity: 1, scale: 1, duration: .35, ease: 'back.out(1.4)' }, '>-.25')
-      .to('.hero__subtitle, .hero__cta', { opacity: 0, y: -25, duration: .35, ease: 'power2.in' }, '>.2')
-      .to('.hero__title', { opacity: .35, duration: .45, ease: 'power2.in' }, '>.8');
+      .to('.hero__title', { scale: .97, duration: 1.4, ease: 'none' }, '>.2')
+      // The landscape rises and the whole title block sinks/fades away together,
+      // starting almost at the same time, so the title visibly sinks under it.
+      .to([art, veil], { yPercent: 0, duration: 2.6, ease: 'power2.out' }, '<')
+      .to('.hero__content', { yPercent: 55, opacity: 0, duration: 2.2, ease: 'power2.in' }, '<+=0.3')
+      .to(splash, { opacity: 1, scale: 1, duration: .35, ease: 'back.out(1.4)' }, '-=.6');
 
     gsap.utils.toArray(
       '.section-label, .intro h2, .intro__grid>div, .work__heading, .project-card, .process__list>div, .contact__inner>*'
