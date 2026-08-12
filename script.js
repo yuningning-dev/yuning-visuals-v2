@@ -57,9 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .from('.hero__content .eyebrow, .hero__title span, .hero__subtitle, .hero__cta',
         { y: 45, opacity: 0, stagger: .1, duration: 1, ease: 'power4.out' }, '-.15')
       .to('.hero__title', { scale: .97, duration: 1.4, ease: 'none' }, '>.2')
-      // The landscape rises and the whole title block sinks/fades away together,
-      // starting almost at the same time, so the title visibly sinks under it.
-      .to([art, veil], { yPercent: 0, duration: 3.4, ease: 'power2.out' }, '<')
+      // HOLD: the title sits still and fully visible here for a solid
+      // stretch of scroll before anything starts moving/fading.
+      .to([art, veil], { yPercent: 0, duration: 3.4, ease: 'power2.out' }, '>+=2.5')
       .to('.hero__content', { yPercent: 18, opacity: 0, duration: 3.4 / 3, ease: 'none' }, '<')
       .to(splash, { opacity: 1, scale: 1, duration: .35, ease: 'back.out(1.4)' }, '-=.6');
 
