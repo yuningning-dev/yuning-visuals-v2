@@ -60,7 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // The landscape rises and the whole title block sinks/fades away together,
       // starting almost at the same time, so the title visibly sinks under it.
       .to([art, veil], { yPercent: 0, duration: 2.6, ease: 'power2.out' }, '<')
-      .to('.hero__content', { yPercent: 55, opacity: 0, duration: 2.2, ease: 'power2.in' }, '<+=0.3')
+      .to('.hero__content', { yPercent: 130, duration: 2.6, ease: 'power1.in' }, '<+=0.3')
+      .to('.hero__content', { opacity: 0, duration: .8, ease: 'power2.in' }, '>-.8')
       .to(splash, { opacity: 1, scale: 1, duration: .35, ease: 'back.out(1.4)' }, '-=.6');
 
     gsap.utils.toArray(
