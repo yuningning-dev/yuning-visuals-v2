@@ -57,10 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
       .from('.hero__content .eyebrow, .hero__title span, .hero__subtitle, .hero__cta',
         { y: 45, opacity: 0, stagger: .1, duration: 1, ease: 'power4.out' }, '-.15')
       .to('.hero__title', { scale: .97, duration: 1.4, ease: 'none' }, '>.2')
-      // HOLD: the title sits still and fully visible here for a solid
-      // stretch of scroll before anything starts moving/fading.
-      .to([art, veil], { yPercent: 0, duration: 3.4, ease: 'power2.out' }, '>+=2.5')
-      .to('.hero__content', { yPercent: 18, opacity: 0, duration: 3.4 / 3, ease: 'none' }, '<')
+      .addLabel('landscapeRise')
+      // Landscape starts appearing here, at its original early timing —
+      // unchanged regardless of how long the title now holds.
+      .to([art, veil], { yPercent: 0, duration: 3.4, ease: 'power2.out' }, 'landscapeRise')
+      // The title holds still, fully visible, for longer now: it only
+      // starts fading 2 units after the landscape begins rising, instead
+      // of at the exact same moment.
+      .to('.hero__content', { yPercent: 18, opacity: 0, duration: 3.4 / 3, ease: 'none' }, 'landscapeRise+=2')
       .to(splash, { opacity: 1, scale: 1, duration: .35, ease: 'back.out(1.4)' }, '-=.6');
 
     gsap.utils.toArray(
