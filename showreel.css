@@ -1,0 +1,209 @@
+/* ==========================================================================
+   Showreel — cinematic UGC grid, perf-first
+   Namespaced under .showreel to avoid clashing with hero/base styles.
+   Falls back gracefully if the design-system tokens below aren't defined
+   elsewhere in styles.css (each var() has a hard fallback value).
+   ========================================================================== */
+
+.showreel {
+  --sr-ink: var(--ink, #0c0c0c);
+  --sr-paper: var(--paper, #f5f2ec);
+  --sr-accent-tech: #4fd1ff;
+  --sr-accent-lifestyle: #ffb15e;
+  --sr-accent-fashion: #ff5ea8;
+  --sr-radius: 14px;
+  --sr-gap: clamp(1rem, 2vw, 1.75rem);
+
+  position: relative;
+  padding: clamp(4rem, 10vw, 8rem) clamp(1.25rem, 5vw, 4rem);
+  background: var(--sr-paper);
+  color: var(--sr-ink);
+  contain: layout style;
+}
+
+.showreel__header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.showreel__eyebrow {
+  font-size: 0.8rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.showreel__title {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.1;
+  margin: 0;
+  max-width: 20ch;
+}
+
+.showreel__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.showreel__filter {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--sr-ink) 20%, transparent);
+  background: transparent;
+  color: var(--sr-ink);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.showreel__filter:hover,
+.showreel__filter:focus-visible {
+  border-color: var(--sr-ink);
+}
+
+.showreel__filter.is-active {
+  background: var(--sr-ink);
+  color: var(--sr-paper);
+  border-color: var(--sr-ink);
+}
+
+.showreel__filter:focus-visible {
+  outline: 2px solid var(--sr-ink);
+  outline-offset: 2px;
+}
+
+.showreel__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--sr-gap);
+}
+
+.showreel__card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--sr-radius);
+  overflow: hidden;
+  background: #000;
+  /* Render offscreen cards cheaply until they're near the viewport. */
+  content-visibility: auto;
+  contain-intrinsic-size: 260px 462px;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.showreel__card.is-hidden {
+  display: none;
+}
+
+.showreel__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  background: #111 center / cover no-repeat;
+  overflow: hidden;
+}
+
+.showreel__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.showreel__video.is-ready {
+  opacity: 1;
+}
+
+.showreel__play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: none;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, #000 45%, transparent);
+  color: #fff;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.showreel__play svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
+}
+
+.showreel__card.is-playing .showreel__play {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.showreel__card:hover .showreel__play,
+.showreel__card:focus-within .showreel__play {
+  transform: scale(1.08);
+}
+
+.showreel__meta {
+  padding: 0.85rem 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: var(--sr-paper);
+  color: var(--sr-ink);
+}
+
+.showreel__tag {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  color: #0c0c0c;
+}
+
+.showreel__card[data-domain="tech"] .showreel__tag { background: var(--sr-accent-tech); }
+.showreel__card[data-domain="lifestyle"] .showreel__tag { background: var(--sr-accent-lifestyle); }
+.showreel__card[data-domain="fashion"] .showreel__tag { background: var(--sr-accent-fashion); }
+
+.showreel__project {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.showreel__role {
+  font-size: 0.82rem;
+  opacity: 0.65;
+  margin: 0;
+}
+
+/* Respect users who asked for less motion or less data: no autoplay,
+   keep the tap-to-play affordance only. */
+@media (prefers-reduced-motion: reduce) {
+  .showreel__video {
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .showreel__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .showreel__grid {
+    grid-template-columns: 1fr;
+  }
+}
